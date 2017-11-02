@@ -85,7 +85,18 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="commands\cmdCalcSelection.vb" />
     <Compile Include="ComAddin.vb" />
+    <Compile Include="commands\cmdFreeze.vb" />
+    <Compile Include="commands\cmdGlobalFind.vb" />
+    <Compile Include="commands\cmdHideSheets.vb" />
+    <Compile Include="commands\cmdListFunctions.vb" />
+    <Compile Include="commands\cmdMarkExcelWindow.vb" />
+    <Compile Include="commands\cmdMisc.vb" />
+    <Compile Include="commands\cmdPasteSpecial.vb" />
+    <Compile Include="commands\cmdRenameWorksheets.vb" />
+    <Compile Include="commands\cmdShowFNames.vb" />
+    <Compile Include="ICmd.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

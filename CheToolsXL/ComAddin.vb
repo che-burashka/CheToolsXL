@@ -243,3 +243,137 @@ End Class
 
 
 
+
+
+Public Class ConnectUnused
+
+    Implements Extensibility.IDTExtensibility2
+
+    Private WithEvents m_host As Excel.Application
+
+    Private m_menuTag As String
+    Private m_root As Office.CommandBarPopup
+    Private m_commands As New Collection
+
+    Public Sub New()
+        MyBase.New()
+        m_menuTag = "XXX"
+    End Sub
+
+    Protected Overrides Sub Finalize()
+        removeRec(m_root)
+        MyBase.Finalize()
+        m_host = Nothing
+    End Sub
+
+
+    Public Sub OnBeginShutdown(ByRef custom As System.Array) Implements Extensibility.IDTExtensibility2.OnBeginShutdown
+    End Sub
+
+    Public Sub OnAddInsUpdate(ByRef custom As System.Array) Implements Extensibility.IDTExtensibility2.OnAddInsUpdate
+    End Sub
+
+    Public Sub OnStartupComplete(ByRef custom As System.Array) Implements Extensibility.IDTExtensibility2.OnStartupComplete
+    End Sub
+
+    Public Sub OnConnection(ByVal application As Object, ByVal connectMode As Extensibility.ext_ConnectMode, ByVal addInInst As Object, ByRef custom As System.Array) Implements Extensibility.IDTExtensibility2.OnConnection
+        m_host = application
+
+
+        m_root = m_host.CommandBars.Item("Worksheet Menu Bar").Controls.Add(MsoControlType.msoControlPopup, m_menuTag, "", True)
+        m_root.Caption = "Che Addin for XL"
+        m_root.Visible = True
+
+        buildMenu()
+
+    End Sub
+
+    Public Sub OnDisconnection(ByVal RemoveMode As Extensibility.ext_DisconnectMode, ByRef custom As System.Array) Implements Extensibility.IDTExtensibility2.OnDisconnection
+
+        removeRec(m_root)
+
+    End Sub
+
+    Private Sub removeRec(ByVal ctl As Office.CommandBarControl)
+
+        Dim chld As Office.CommandBarControl
+        Dim popup As Office.CommandBarPopup
+
+        Try
+
+            If TypeOf (ctl) Is Office.CommandBarPopup Then
+                popup = ctl
+                For Each chld In popup.Controls
+                    removeRec(chld)
+                Next
+            End If
+            ctl.Delete()
+        Catch e As Exception
+            '
+        End Try
+    End Sub
+
+
+    Private Sub addButton(ByVal mnu As Office.CommandBarPopup, ByVal nm As String, ByVal cmd As ICmd, ByVal fwd As Boolean)
+
+        Dim btn As Office.CommandBarButton
+        btn = mnu.Controls.Add(MsoControlType.msoControlButton, "", m_menuTag, "", True)
+        btn.Caption = nm
+        btn.Visible = True
+
+        cmd.Init(btn, m_host, fwd)
+        Me.m_commands.Add(cmd)
+
+    End Sub
+
+    Private Function addSubMenu(ByVal mnu As Office.CommandBarPopup, ByVal nm As String) As Office.CommandBarPopup
+
+        Dim smnu As Office.CommandBarPopup
+        smnu = mnu.Controls.Add(MsoControlType.msoControlPopup, "", m_menuTag, "", True)
+        smnu.Caption = nm
+        smnu.Visible = True
+        addSubMenu = smnu
+
+    End Function
+
+
+    ' add addin menu here:
+    Private Sub buildMenu()
+        Dim cm As Office.CommandBarPopup
+        cm = m_root
+
+        '' Application level
+        addButton(cm, "Show &Filenames", New cmdShowFNames, True)
+        addButton(cm, "&Normalize Settings", New cmdSetMySettings, True)
+        addButton(cm, "Mark &XL Window", New cmdMarkExcelWindow, True)
+
+
+        '' Workbook level
+        cm = addSubMenu(m_root, "This &Workbook")
+        addButton(cm, "&Find &Globally in Workbook", New cmdGlobalFind, True)
+        addButton(cm, "&List Functions in Workbook", New cmdListFunctions, True)
+        addButton(cm, "&Hide Sheets", New cmdHideSheets, True)
+        addButton(cm, "&Unhide Sheets", New cmdHideSheets, False)
+        addButton(cm, "Highlight Names", New cmdHighlightNamedRanges, True)
+        addButton(cm, "Undo Highlight Names", New cmdHighlightNamedRanges, False)
+
+        '' Sheet level
+        ''cm = addSubMenu(m_root, "Sheet")
+        ''addButton(cm, "Sheet Dependents", New cmdExtSheetDependants, False)
+
+        '' Selection/ Active Cell level
+        cm = addSubMenu(m_root, "&Selection")
+
+        addButton(cm, "&Calc", New cmdCalcSelection, True)
+        addButton(cm, "&Freeze", New cmdFreeze, True)
+        addButton(cm, "&Thaw", New cmdFreeze, False)
+
+
+        addButton(cm, "&Paste Special", New cmdPasteSpecial, True)
+
+
+    End Sub
+
+
+
+End Class
