@@ -135,8 +135,8 @@ Friend Class frmApplicationCaption
     Private Sub cmdOK_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdOK.Click
 
         Dim pid As Integer
-        'Call GetWindowThreadProcessId(oHostApp.VBE.MainWindow.HWnd, pid)
-        pid = 1
+        '' requires 'Trust programmatic access to VBA projects'
+        Call GetWindowThreadProcessId(oHostApp.VBE.MainWindow.HWnd, pid)
         oHostApp.Caption = "XL" & CStr(pid) & ": " & Me.txtNameInput.Text
         Me.Close()
     End Sub
