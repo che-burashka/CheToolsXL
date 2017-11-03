@@ -54,6 +54,51 @@ ehandler:
 
     End Sub
 
+    Sub GetNamesOfFunctions(ByVal formulaString As String, ByRef fcnNames As System.Collections.Generic.SortedDictionary(Of String, Int16))
+
+        Dim pos As Integer
+        Dim c As String
+
+        Dim currentFcnName As String
+        currentFcnName = ""
+
+        For pos = 1 To Len(formulaString)
+
+            c = Mid(formulaString, pos, 1)
+
+            If Strings.InStr("+-*/ =:;<>&", c) > 0 Then
+                currentFcnName = ""
+            Else
+
+                Select Case c
+
+                    Case "("
+                        If (Len(currentFcnName) > 0) Then
+                            fcnNames.Item(LCase(currentFcnName)) = 0
+                            currentFcnName = ""
+                        End If
+                    Case ")"
+                        currentFcnName = ""
+                    Case ","
+                        currentFcnName = ""
+                    Case "|"
+                        If (Len(currentFcnName) > 0) Then
+                            fcnNames.Item(LCase(currentFcnName)) = 0
+                            currentFcnName = ""
+                        End If
+                    Case Else
+                        currentFcnName = currentFcnName & c
+
+                End Select
+
+            End If
+
+        Next  ''pos
+
+    End Sub
+
+
+
     Function listAllFunctionsInWbk(ByRef wbk As Excel.Workbook) As System.Collections.Generic.SortedDictionary(Of String, Int16)
 
         Dim ret As New System.Collections.Generic.SortedDictionary(Of String, Int16)
@@ -88,7 +133,7 @@ ehandler:
                             r3 = r2.Cells.Item(i2)
                             'UPGRADE_WARNING: Couldn't resolve default property of object r3.Formula. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                             formulaString = r3.Formula
-                            'If InStr(formulaString, "(") Then Call GetNamesOfFunctions(formulaString, ret)
+                            If InStr(formulaString, "(") Then Call GetNamesOfFunctions(formulaString, ret)
                         Next
                     End If
                 Next i1

@@ -124,7 +124,7 @@ Public Class cmdHighlightNamedRanges
 
         If clr >= 0 Then
             r.BorderAround()
-            r.BorderAround(ExcelConsts.XlLineStyle.xlLineStyleNone, ExcelConsts.XlBorderWeight.xlThin, clr)
+            r.BorderAround(ExcelConsts.XlLineStyle.xlContinuous, ExcelConsts.XlBorderWeight.xlThin, clr)
             Dim tmp As String
             tmp = nm.Name
             r.Cells(1, 1).AddComment(tmp)
