@@ -13,8 +13,8 @@ Public Class cmdMarkExcelWindow
     End Sub
 
     Private Sub clickHandler(ByVal b As Office.CommandBarButton, ByRef cd As Boolean) Handles m_btn.ClickEvent
-        'frmApplicationCaption.oHostApp = m_host
-        'frmApplicationCaption.DefInstance.ShowDialog()
+        frmApplicationCaption.oHostApp = m_host
+        frmApplicationCaption.DefInstance.ShowDialog()
     End Sub
 
 

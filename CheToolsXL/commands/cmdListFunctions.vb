@@ -27,30 +27,24 @@ Public Class cmdListFunctions
 
         fcnNames = listAllFunctionsInWbk((m_host.ActiveWorkbook))
 
-        'frmFunctionsList.DefInstance.lstFunctionNames.Items.Clear()
-        'frmFunctionsList.DefInstance.doSave = False
+        frmFunctionsList.DefInstance.lstFunctionNames.Items.Clear()
+        frmFunctionsList.DefInstance.doSave = False
 
         Dim f As Object
         For Each f In fcnNames
-            'frmFunctionsList.DefInstance.lstFunctionNames.Items.Add(f.Key)
+            frmFunctionsList.DefInstance.lstFunctionNames.Items.Add(f.Key)
         Next f
 
-        'frmFunctionsList.DefInstance.Text = "Functions used in " & m_host.ActiveWorkbook.Name
-        'frmFunctionsList.DefInstance.ShowDialog()
+        frmFunctionsList.DefInstance.Text = "Functions used in " & m_host.ActiveWorkbook.Name
+        frmFunctionsList.DefInstance.ShowDialog()
 
-        '        Dim fname As Object
-        '       Dim fso As New FileSystemObject
-        '      Dim ts As Scripting.TextStream
-        '     If frmFunctionsList.DefInstance.doSave Then
-        '    fname = m_host.GetSaveAsFilename(initialFilename:="functions.txt", fileFilter:="Text Files (*.txt), *.txt")
-        '   If VarType(fname) = VariantType.String Then
-        '  ts = fso.CreateTextFile(fname, True)
-        ' For Each f In fcnNames
-        'ts.WriteLine(f.Key)
-        'Next f
-        'ts.Close()
-        'End If
-        'End If
+        Dim fname As String
+        If frmFunctionsList.DefInstance.doSave Then
+            fname = m_host.GetSaveAsFilename(initialFilename:="functions.txt", fileFilter:="Text Files (*.txt), *.txt")
+            If VarType(fname) = VariantType.String Then
+                '' todo: save to file here
+            End If
+        End If
 
         Exit Sub
 

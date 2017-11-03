@@ -13,8 +13,8 @@ Public Class cmdGlobalFind
     End Sub
 
     Private Sub clickHandler(ByVal b As Office.CommandBarButton, ByRef cd As Boolean) Handles m_btn.ClickEvent
-        'frmGlobalFind.DefInstance.oHostApp = m_host
-        'frmGlobalFind.DefInstance.ShowDialog()
+        frmGlobalFind.DefInstance.oHostApp = m_host
+        frmGlobalFind.DefInstance.ShowDialog()
     End Sub
 
 End Class

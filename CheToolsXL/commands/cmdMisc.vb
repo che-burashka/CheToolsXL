@@ -3,6 +3,50 @@ Imports Excel = NetOffice.ExcelApi
 
 Imports ExcelConsts = NetOffice.ExcelApi.Enums
 
+Public Class Utils
+
+    Shared Sub NormalizeWbk(ByVal wbk As Excel.Workbook)
+        '
+        Dim sht As Excel.Worksheet
+        Dim win As Excel.Window
+
+        Try
+            For Each sht In wbk.Worksheets
+                sht.DisplayPageBreaks = False
+            Next
+            For Each win In wbk.Windows
+                win.DisplayGridlines = False
+                win.Zoom = 100
+            Next
+        Catch ex As Exception
+            'MsgBox(Err.Description)
+        End Try
+
+
+    End Sub
+
+    Shared Sub NormalizeAll(ByVal xl As Excel.Application)
+
+        Dim wbk As Excel.Workbook
+
+        xl.DisplayAlerts = False
+        xl.Calculation = Excel.Enums.XlCalculation.xlCalculationManual
+        xl.CalculateBeforeSave = False
+        'xl.AutomationSecurity = Microsoft.Office.Core.MsoAutomationSecurity.msoAutomationSecurityForceDisable
+        xl.DisplayPasteOptions = False
+        xl.FixedDecimalPlaces = 2
+        xl.SheetsInNewWorkbook = 1
+        'xl.ShowWindowsInTaskbar = False
+
+        For Each wbk In xl.Workbooks
+            Utils.NormalizeWbk(wbk)
+        Next
+
+    End Sub
+
+End Class
+
+
 Public Class cmdSetMySettings
     '' normalize everything
     Implements ICmd
@@ -22,31 +66,6 @@ Public Class cmdSetMySettings
         'Utils.NormalizeAll(m_host)
     End Sub
 End Class
-
-Public Class cmdDependents
-    '' normalize everything
-    Implements ICmd
-    Private WithEvents m_btn As Office.CommandBarButton
-    Private m_host As Excel.Application
-
-    Public Sub Init(ByVal btn As Office.CommandBarButton, ByVal host As Object, ByVal fwd As Boolean) Implements ICmd.Init
-        m_btn = btn
-        m_host = host
-    End Sub
-
-    Private Sub clickHandler(ByVal b As Office.CommandBarButton, ByRef cd As Boolean) Handles m_btn.ClickEvent
-        Run()
-    End Sub
-
-    Sub Run()
-        'Dim f As New frmDependents
-        'Dim f As New frmDependsOnTree
-        'f.init(m_host.ActiveCell, m_host)
-        'f.ShowDialog()
-    End Sub
-End Class
-
-
 
 
 Public Class cmdHighlightNamedRanges

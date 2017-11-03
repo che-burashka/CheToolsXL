@@ -32,7 +32,7 @@ Public Class cmdPasteSpecial
         Dim frmls As Integer
         Dim fmts As Integer
         Dim clearAfter As Integer
-        'clearAfter = frmPasteSpecial.DefInstance.chkClearClipboard.CheckState
+        clearAfter = frmPasteSpecial.DefInstance.chkClearClipboard.CheckState
 
         If Not (TypeOf (m_host.Selection) Is Excel.Range) Then
             ''If TypeName(m_host.Selection) <> "Range" Then
@@ -40,18 +40,18 @@ Public Class cmdPasteSpecial
             Exit Sub
         End If
 
-        '''frmPasteSpecial.DefInstance.ShowDialog()
+        frmPasteSpecial.DefInstance.ShowDialog()
 
-        If False Then 'frmPasteSpecial.DefInstance.OKCancel Then
+        If frmPasteSpecial.DefInstance.OKCancel Then
 
             On Error GoTo tryagain
 
             sel = m_host.Selection
 
-            'trans = frmPasteSpecial.DefInstance.chkTranspose.CheckState
-            'vals = frmPasteSpecial.DefInstance.chkValues.CheckState
-            'frmls = frmPasteSpecial.DefInstance.chkFormulas.CheckState
-            'fmts = frmPasteSpecial.DefInstance.chkFormats.CheckState
+            trans = frmPasteSpecial.DefInstance.chkTranspose.CheckState
+            vals = frmPasteSpecial.DefInstance.chkValues.CheckState
+            frmls = frmPasteSpecial.DefInstance.chkFormulas.CheckState
+            fmts = frmPasteSpecial.DefInstance.chkFormats.CheckState
 
             If vals = 1 Then
                 If trans = 1 Then sel.PasteSpecial(Excel.Enums.XlPasteType.xlPasteValues, Excel.Enums.XlPasteSpecialOperation.xlPasteSpecialOperationNone, False, True)

@@ -31,7 +31,15 @@ Public Class Addin
     Private Shared ReadOnly _contextName As String = "Che ContextMenu"
     Private Shared ReadOnly _contextMenuButtonName As String = "Che ContextButton"
 
-    Dim _excelApplication As Excel.Application
+    Private WithEvents m_host As Excel.Application
+    Private m_menuTag As String
+    Private m_root As Office.CommandBarPopup
+    Private m_commands As New Collection
+
+    Public Sub New()
+        MyBase.New()
+        m_menuTag = "CheAddinMenuTag"
+    End Sub
 
 #Region "IDTExtensibility2 Members"
 
@@ -39,7 +47,15 @@ Public Class Addin
 
         Try
 
-            _excelApplication = New Excel.Application(Nothing, Application)
+            m_host = New Excel.Application(Nothing, Application)
+
+            'm_root = m_host.CommandBars.Item("Worksheet Menu Bar").Controls.Add(MsoControlType.msoControlPopup, m_menuTag, "", True)
+            m_root = m_host.CommandBars.Item("Worksheet Menu Bar").Controls.Add(MsoControlType.msoControlPopup)
+            m_root.Caption = "Che Addin for XL"
+            m_root.Visible = True
+
+            buildMenu()
+
 
         Catch ex As Exception
 
@@ -53,9 +69,9 @@ Public Class Addin
     Public Sub OnDisconnection(ByVal RemoveMode As ext_DisconnectMode, ByRef custom As System.Array) Implements IDTExtensibility2.OnDisconnection
 
         Try
-
-            If (Not IsNothing(_excelApplication)) Then
-                _excelApplication.Dispose()
+            removeRec(m_root)
+            If (Not IsNothing(m_host)) Then
+                m_host.Dispose()
             End If
 
         Catch ex As Exception
@@ -71,7 +87,7 @@ Public Class Addin
 
         Try
 
-            CreateTemporaryUserInterface()
+            ''CreateTemporaryUserInterface()
 
         Catch ex As Exception
 
@@ -160,7 +176,7 @@ Public Class Addin
         ' http://msdn.microsoft.com/en-us/library/0batekf4.aspx   
 
         'create commandbar 
-        Dim commandBar As Office.CommandBar = _excelApplication.CommandBars.Add(_toolbarName, MsoBarPosition.msoBarTop, System.Type.Missing, True)
+        Dim commandBar As Office.CommandBar = m_host.CommandBars.Add(_toolbarName, MsoBarPosition.msoBarTop, System.Type.Missing, True)
         commandBar.Visible = True
 
         ' add popup to commandbar
@@ -178,7 +194,7 @@ Public Class Addin
         AddHandler commandBarBtn.ClickEvent, clickHandler
 
         ' create menu 
-        commandBar = _excelApplication.CommandBars("Worksheet Menu Bar")
+        commandBar = m_host.CommandBars("Worksheet Menu Bar")
 
         ' add popup to menu bar
         commandBarPop = commandBar.Controls.Add(MsoControlType.msoControlPopup, System.Type.Missing, System.Type.Missing, System.Type.Missing, True)
@@ -195,7 +211,7 @@ Public Class Addin
         AddHandler commandBarBtn.ClickEvent, clickHandler
 
         ' create context menu 
-        commandBarPop = _excelApplication.CommandBars("Cell").Controls.Add(MsoControlType.msoControlPopup, System.Type.Missing, System.Type.Missing, System.Type.Missing, True)
+        commandBarPop = m_host.CommandBars("Cell").Controls.Add(MsoControlType.msoControlPopup, System.Type.Missing, System.Type.Missing, System.Type.Missing, True)
         commandBarPop.Caption = _contextName
         commandBarPop.Tag = _contextName
 
@@ -239,60 +255,6 @@ Public Class Addin
 
 #End Region
 
-End Class
-
-
-
-
-
-Public Class ConnectUnused
-
-    Implements Extensibility.IDTExtensibility2
-
-    Private WithEvents m_host As Excel.Application
-
-    Private m_menuTag As String
-    Private m_root As Office.CommandBarPopup
-    Private m_commands As New Collection
-
-    Public Sub New()
-        MyBase.New()
-        m_menuTag = "XXX"
-    End Sub
-
-    Protected Overrides Sub Finalize()
-        removeRec(m_root)
-        MyBase.Finalize()
-        m_host = Nothing
-    End Sub
-
-
-    Public Sub OnBeginShutdown(ByRef custom As System.Array) Implements Extensibility.IDTExtensibility2.OnBeginShutdown
-    End Sub
-
-    Public Sub OnAddInsUpdate(ByRef custom As System.Array) Implements Extensibility.IDTExtensibility2.OnAddInsUpdate
-    End Sub
-
-    Public Sub OnStartupComplete(ByRef custom As System.Array) Implements Extensibility.IDTExtensibility2.OnStartupComplete
-    End Sub
-
-    Public Sub OnConnection(ByVal application As Object, ByVal connectMode As Extensibility.ext_ConnectMode, ByVal addInInst As Object, ByRef custom As System.Array) Implements Extensibility.IDTExtensibility2.OnConnection
-        m_host = application
-
-
-        m_root = m_host.CommandBars.Item("Worksheet Menu Bar").Controls.Add(MsoControlType.msoControlPopup, m_menuTag, "", True)
-        m_root.Caption = "Che Addin for XL"
-        m_root.Visible = True
-
-        buildMenu()
-
-    End Sub
-
-    Public Sub OnDisconnection(ByVal RemoveMode As Extensibility.ext_DisconnectMode, ByRef custom As System.Array) Implements Extensibility.IDTExtensibility2.OnDisconnection
-
-        removeRec(m_root)
-
-    End Sub
 
     Private Sub removeRec(ByVal ctl As Office.CommandBarControl)
 
@@ -317,7 +279,8 @@ Public Class ConnectUnused
     Private Sub addButton(ByVal mnu As Office.CommandBarPopup, ByVal nm As String, ByVal cmd As ICmd, ByVal fwd As Boolean)
 
         Dim btn As Office.CommandBarButton
-        btn = mnu.Controls.Add(MsoControlType.msoControlButton, "", m_menuTag, "", True)
+        'btn = mnu.Controls.Add(MsoControlType.msoControlButton, "", m_menuTag, "", True)
+        btn = mnu.Controls.Add(MsoControlType.msoControlButton)
         btn.Caption = nm
         btn.Visible = True
 
@@ -329,7 +292,8 @@ Public Class ConnectUnused
     Private Function addSubMenu(ByVal mnu As Office.CommandBarPopup, ByVal nm As String) As Office.CommandBarPopup
 
         Dim smnu As Office.CommandBarPopup
-        smnu = mnu.Controls.Add(MsoControlType.msoControlPopup, "", m_menuTag, "", True)
+        'smnu = mnu.Controls.Add(MsoControlType.msoControlPopup, "", m_menuTag, "", True)
+        smnu = mnu.Controls.Add(MsoControlType.msoControlPopup)
         smnu.Caption = nm
         smnu.Visible = True
         addSubMenu = smnu
@@ -375,5 +339,5 @@ Public Class ConnectUnused
     End Sub
 
 
-
 End Class
+
