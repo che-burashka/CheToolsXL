@@ -50,7 +50,16 @@ Public Class Addin
             m_host = New Excel.Application(Nothing, Application)
 
             'm_root = m_host.CommandBars.Item("Worksheet Menu Bar").Controls.Add(MsoControlType.msoControlPopup, m_menuTag, "", True)
-            m_root = m_host.CommandBars.Item("Worksheet Menu Bar").Controls.Add(MsoControlType.msoControlPopup)
+            'm_root = m_host.CommandBars.Item("Worksheet Menu Bar").Controls.Add(MsoControlType.msoControlPopup)
+
+            Dim commandBar As Office.CommandBar = m_host.CommandBars.Add(_toolbarName, MsoBarPosition.msoBarTop, System.Type.Missing, True)
+            commandBar.Visible = True
+
+            ' add popup to commandbar
+            m_root = commandBar.Controls.Add(MsoControlType.msoControlPopup, System.Type.Missing, System.Type.Missing, System.Type.Missing, True)
+
+            'm_root = m_host.CommandBars.Add(_toolbarName, MsoBarPosition.msoBarTop, System.Type.Missing, True)
+
             m_root.Caption = "Che Addin for XL"
             m_root.Visible = True
 

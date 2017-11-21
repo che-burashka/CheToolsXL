@@ -2,6 +2,8 @@ Imports Excel = NetOffice.ExcelApi
 Imports NetOffice.ExcelApi.Enums
 Imports Office = NetOffice.OfficeApi
 
+Imports System.Windows.Forms
+
 Public Class cmdCalcSelection
 
     Implements ICmd
@@ -19,6 +21,9 @@ Public Class cmdCalcSelection
 
 
     Sub Run()
+        Dim wbk As Excel.Workbook
+        wbk = m_host.ActiveWorkbook
+        MessageBox.Show(wbk.FullName)
         Dim selObj As Object
         selObj = m_host.Selection
         Dim selRge As Excel.Range

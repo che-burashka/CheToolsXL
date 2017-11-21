@@ -1,5 +1,6 @@
 Imports Office = NetOffice.OfficeApi
 Imports Excel = NetOffice.ExcelApi
+Imports System.IO
 
 Public Class cmdListFunctions
 
@@ -15,7 +16,6 @@ Public Class cmdListFunctions
     Private Sub clickHandler(ByVal b As Office.CommandBarButton, ByRef cd As Boolean) Handles m_btn.ClickEvent
         Run()
     End Sub
-
 
     Sub Run()
 
@@ -41,8 +41,19 @@ Public Class cmdListFunctions
         Dim fname As String
         If frmFunctionsList.DefInstance.doSave Then
             fname = m_host.GetSaveAsFilename(initialFilename:="functions.txt", fileFilter:="Text Files (*.txt), *.txt")
-            If VarType(fname) = VariantType.String Then
-                '' todo: save to file here
+            fname = System.IO.Path.ChangeExtension(fname, "txt")
+
+            fname = m_host.GetSaveAsFilename(initialFilename:=fname, fileFilter:="Text
+            Files (*.txt), *.txt")
+           
+			If VarType(fname) = VariantType.String Then
+                
+                Dim file As System.IO.StreamWriter
+                file = My.Computer.FileSystem.OpenTextFileWriter(fname, False)
+                For Each ff As String In fcnNames.Keys
+                    file.WriteLine(ff)
+                Next
+                file.Close()
             End If
         End If
 
@@ -97,8 +108,6 @@ ehandler:
 
     End Sub
 
-
-
     Function listAllFunctionsInWbk(ByRef wbk As Excel.Workbook) As System.Collections.Generic.SortedDictionary(Of String, Int16)
 
         Dim ret As New System.Collections.Generic.SortedDictionary(Of String, Int16)
@@ -123,17 +132,22 @@ ehandler:
                     Dim r2 As Excel.Range
                     r2 = r1.Areas.Item(i1)
 
-                    If r2.HasArray Then
-                        'UPGRADE_WARNING: Couldn't resolve default property of object r2.CurrentArray.FormulaArray. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
+                    Dim ha As Object
+                    ha = r2.HasArray
+                    If Not TypeOf ha Is Boolean Then
+                        ha = False
+                    End If
+                    If ha Then
                         formulaString = r2.CurrentArray.FormulaArray
-                        'If InStr(formulaString, "(") Then Call GetNamesOfFunctions(formulaString, ret)
+                        If InStr(formulaString, "(") Then Call GetNamesOfFunctions(formulaString, ret)
+
                     Else
                         Dim r3 As Excel.Range
                         For i2 = 1 To r2.Cells.Count
                             r3 = r2.Cells.Item(i2)
-                            'UPGRADE_WARNING: Couldn't resolve default property of object r3.Formula. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
                             formulaString = r3.Formula
                             If InStr(formulaString, "(") Then Call GetNamesOfFunctions(formulaString, ret)
+
                         Next
                     End If
                 Next i1
